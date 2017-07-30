@@ -243,7 +243,7 @@ app.post('/uploadNewStudentMarks', function (req, res) {
                                                         " dbt_Total,"+
                                                         " se_ppt,"+
                                                         " se_MCQ,"+
-                                                        " se_Total) values(?, ? ,?, ?, ? ,?, ?, ? ,?, ?, ? ,?, ?, ? ,?, ?, ?, ? ,?, ?, ? ,?, ?, ? ,?)";
+                                                        " se_Total, net_Lab, net_MCQ, net_Total) values(?, ? ,?, ?, ? ,?, ?, ? ,?, ?, ? ,?, ?, ? ,?, ?, ?, ? ,?, ?, ? ,?, ?, ? ,?, ?, ? ,?)";
                     var param = [result[i].studentid,
                                  result[i].oopcpp_lab,
                                  result[i].oopcpp_mcq,
@@ -271,7 +271,10 @@ app.post('/uploadNewStudentMarks', function (req, res) {
                                  result[i].dbt_total,
                                  result[i].se_ppt,
                                  result[i].se_mcq,
-                                 result[i].se_total];
+                                 result[i].se_total,
+                                 result[i].net_lab,
+                                 result[i].net_mcq,
+                                 result[i].net_total];
 
                     connection.query(sql, param, function (err, results) {
                         if (!err) {
@@ -281,6 +284,200 @@ app.post('/uploadNewStudentMarks', function (req, res) {
                         console.log("command exec");
                     });
                     
+                    connection.end();
+                }
+                if(i>result.length);
+                    {
+                        res.send("Insert Successfull");
+                    }
+                console.log("Program Ended");
+            });
+
+        } catch (e) {
+            res.json({ error_code: 1, err_desc: "Corupted excel file" });
+        }
+    })
+
+});
+
+app.post('/uploadNewMentor', function (req, res) {
+    var exceltojson;
+    upload(req, res, function (err) {
+        if (err) {
+            res.json({ error_code: 1, err_desc: err });
+            return;
+        }
+        /** Multer gives us file info in req.file object */
+        var inp = req.file;
+        if (!req.file) {
+            res.json({ error_code: 1, err_desc: "No file passed" });
+            return;
+        }
+        /** Check the extension of the incoming file and 
+         *  use the appropriate module
+         */
+        if (req.file.originalname.split('.')[req.file.originalname.split('.').length - 1] === 'xlsx') {
+            exceltojson = xlsxtojson;
+        } else {
+            exceltojson = xlstojson;
+        }
+        console.log(req.file.path);
+        try {
+            exceltojson({
+                input: req.file.path,
+                output: req.file.path, //since we don't need output.json
+                lowerCaseHeaders: true
+            }, function (err, result) {
+
+                for (var i = 0; i < result.length; i++) {
+                    var connection = mysql.createConnection(config);
+                    connection.connect();
+
+                    var sql = "insert into mentor values(?, ? ,?)";
+                    var param = [result[i].mentorid, result[i].mentorusername, result[i].mentorpassword];
+
+                    connection.query(sql, param, function (err, results) {
+                        if (!err) {
+                            console.log(results);
+                        }
+
+                        console.log("command exec");
+                    });
+
+                    connection.end();
+                }
+                if(i>result.length);
+                    {
+                        res.send("Insert Successfull");
+                    }
+                console.log("Program Ended");
+            });
+
+        } catch (e) {
+            res.json({ error_code: 1, err_desc: "Corupted excel file" });
+        }
+    })
+
+});
+
+app.post('/uploadNewMentorDetails', function (req, res) {
+    var exceltojson;
+    upload(req, res, function (err) {
+        if (err) {
+            res.json({ error_code: 1, err_desc: err });
+            return;
+        }
+        /** Multer gives us file info in req.file object */
+        var inp = req.file;
+        if (!req.file) {
+            res.json({ error_code: 1, err_desc: "No file passed" });
+            return;
+        }
+        /** Check the extension of the incoming file and 
+         *  use the appropriate module
+         */
+        if (req.file.originalname.split('.')[req.file.originalname.split('.').length - 1] === 'xlsx') {
+            exceltojson = xlsxtojson;
+        } else {
+            exceltojson = xlstojson;
+        }
+        console.log(req.file.path);
+        try {
+            exceltojson({
+                input: req.file.path,
+                output: req.file.path, //since we don't need output.json
+                lowerCaseHeaders: true
+            }, function (err, result) {
+
+                for (var i = 0; i < result.length; i++) {
+                    var connection = mysql.createConnection(config);
+                    connection.connect();
+
+                    var sql = "insert into mentordetails(mentorName,"+
+                                                        " yearOfExperience,"+
+                                                        " mentorId,"+
+                                                        " contactNo,"+
+                                                        " company,"+
+                                                        " areaOfExpertise,"+
+                                                        " batch,"+
+                                                        " email, teamId) values(?, ? ,?, ?, ? ,?, ?, ? ,?)";
+                    var param = [result[i].mentorname, result[i].yearofexperience, result[i].mentorid, result[i].contactno, result[i].company, result[i].areaofexpertise, result[i].batch, result[i].email, result[i].teamid];
+
+                    connection.query(sql, param, function (err, results) {
+                        if (!err) {
+                            console.log(results);
+                        }
+
+                        console.log("command exec");
+                    });
+
+                    connection.end();
+                }
+                if(i>result.length);
+                    {
+                        res.send("Insert Successfull");
+                    }
+                console.log("Program Ended");
+            });
+
+        } catch (e) {
+            res.json({ error_code: 1, err_desc: "Corupted excel file" });
+        }
+    })
+
+});
+
+app.post('/uploadUpdateMentorDetails', function (req, res) {
+    var exceltojson;
+    upload(req, res, function (err) {
+        if (err) {
+            res.json({ error_code: 1, err_desc: err });
+            return;
+        }
+        /** Multer gives us file info in req.file object */
+        var inp = req.file;
+        if (!req.file) {
+            res.json({ error_code: 1, err_desc: "No file passed" });
+            return;
+        }
+        /** Check the extension of the incoming file and 
+         *  use the appropriate module
+         */
+        if (req.file.originalname.split('.')[req.file.originalname.split('.').length - 1] === 'xlsx') {
+            exceltojson = xlsxtojson;
+        } else {
+            exceltojson = xlstojson;
+        }
+        console.log(req.file.path);
+        try {
+            exceltojson({
+                input: req.file.path,
+                output: req.file.path, //since we don't need output.json
+                lowerCaseHeaders: true
+            }, function (err, result) {
+
+                for (var i = 0; i < result.length; i++) {
+                    var connection = mysql.createConnection(config);
+                    connection.connect();
+
+                    var sql = "update mentordetails set mentorName=?,"+
+                                                        " yearOfExperience = ?,"+
+                                                        " mentorId = ?,"+
+                                                        " contactNo = ?,"+
+                                                        " company = ?,"+
+                                                        " areaOfExpertise = ?,"+
+                                                        " batch = ?,"+
+                                                        " email = ?, teamId = ? where mentorId = ?";
+                    var param = [result[i].mentorname, result[i].yearofexperience, result[i].mentorid, result[i].contactno, result[i].company, result[i].areaofexpertise, result[i].batch, result[i].email, result[i].teamid, result[i].mentorid];
+
+                    connection.query(sql, param, function (err, results) {
+                        if (!err) {
+                            console.log(results);
+                        }
+
+                        console.log("command exec");
+                    });
+
                     connection.end();
                 }
                 if(i>result.length);
